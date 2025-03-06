@@ -1,254 +1,93 @@
 # Jira MCP Server
 
-Speak to Jira in natural language to get information on and modify your project. Use it with Claude Desktop in combination with a custom README that you will create with project information, so that you can delegate PM tasks, (e.g. given yoou have a list of my team and their specialities, assign any new issue to the most relevant person).
+A powerful Jira integration server built using the [Model Context Protocol](https://github.com/modelcontextprotocol) (MCP). This server provides a standardized interface for AI agents to interact with Jira, enabling seamless automation and management of Jira issues and workflows.
 
-Built using the [Model Context Protocol](https://github.com/modelcontextprotocol).
+## Features
 
-The server enables:
+This server implements various Jira operations through MCP tools:
 
-- Project creation and configuration
-- Issue and subtask management
-- Issue linking and dependencies
-- Automated issue workflows
+### Issue Management
 
-## Configuration
+- Create new issues with customizable fields
+- Update existing issues
+- Delete issues
+- Create issue links between related tickets
 
-Required environment variables:
+### Issue Information
 
-- `JIRA_HOST`: Your Jira instance hostname
-- `JIRA_EMAIL`: Your Jira account email
-- `JIRA_API_TOKEN`: API token from https://id.atlassian.com/manage-profile/security/api-tokens
+- Retrieve issue details
+- Get issue comments
+- List available fields
+- List issue types
+- List link types
+
+### User Operations
+
+- Get user information by email
+- Create work logs
+- Manage comments
+- Handle issue assignments
+
+## Architecture
+
+The server is built on the Model Context Protocol, which provides a standardized way for AI models to interact with external tools and services. Each Jira operation is implemented as a separate MCP tool, making the codebase modular and easily extensible.
 
 ## Available Tools
 
-### 1. User Management
+The following MCP tools are available in this server:
 
-```typescript
-// Get user's account ID by email
-{
-  email: "user@example.com";
-}
-```
+- `create_issue`: Create new Jira issues with customizable fields
+- `update_issue`: Modify existing issues
+- `delete_issue`: Remove issues from Jira
+- `create_issue_link`: Create relationships between issues
+- `get_issue`: Retrieve issue details
+- `get_comments`: Fetch comments for an issue
+- `create_worklog`: Log work against issues
+- `create_comment`: Add comments to issues
+- `list_fields`: Get available Jira fields
+- `list_issue_types`: Get available issue types
+- `list_link_types`: Get available link types
+- `get_user`: Retrieve user information
 
-### 2. Issue Type Management
+## Getting Started
 
-```typescript
-// List all available issue types
-// Returns: id, name, description, subtask status
-// No parameters required
-```
-
-### 3. Issue Link Types
-
-```typescript
-// List all available issue link types
-// Returns: id, name, inward/outward descriptions
-// No parameters required
-```
-
-### 4. Issue Management
-
-#### Retrieving Issues
-
-```typescript
-// Get all issues in a project
-{
-  projectKey: "PROJECT"
-}
-
-// Get issues with JQL filtering
-{
-  projectKey: "PROJECT",
-  jql: "status = 'In Progress' AND assignee = currentUser()"
-}
-
-// Get issues assigned to user
-{
-  projectKey: "PROJECT",
-  jql: "assignee = 'user@example.com' ORDER BY created DESC"
-}
-```
-
-#### Creating Issues
-
-```typescript
-// Create a standard issue
-{
-  projectKey: "PROJECT",
-  summary: "Issue title",
-  issueType: "Task",  // or "Story", "Bug", etc.
-  description: "Detailed description",
-  assignee: "accountId",  // from get_user tool
-  labels: ["frontend", "urgent"],
-  components: ["ui", "api"],
-  priority: "High"
-}
-
-// Create a subtask
-{
-  parent: "PROJECT-123",
-  projectKey: "PROJECT",
-  summary: "Subtask title",
-  issueType: "Subtask",
-  description: "Subtask details",
-  assignee: "accountId"
-}
-```
-
-#### Updating Issues
-
-```typescript
-// Update issue fields
-{
-  issueKey: "PROJECT-123",
-  summary: "Updated title",
-  description: "New description",
-  assignee: "accountId",
-  status: "In Progress",
-  priority: "High"
-}
-```
-
-#### Issue Dependencies
-
-```typescript
-// Create issue link
-{
-  linkType: "Blocks",  // from list_link_types
-  inwardIssueKey: "PROJECT-124",  // blocked issue
-  outwardIssueKey: "PROJECT-123"  // blocking issue
-}
-```
-
-#### Deleting Issues
-
-```typescript
-// Delete single issue
-{
-  issueKey: "PROJECT-123"
-}
-
-// Delete issue with subtasks
-{
-  issueKey: "PROJECT-123",
-  deleteSubtasks: true
-}
-
-// Delete multiple issues
-{
-  issueKeys: ["PROJECT-123", "PROJECT-124"]
-}
-```
-
-## Field Formatting
-
-### Description Field
-
-The description field supports markdown-style formatting:
-
-- Use blank lines between paragraphs
-- Use "- " for bullet points
-- Use "1. " for numbered lists
-- Use headers ending with ":" (followed by blank line)
-
-Example:
-
-```
-Task Overview:
-
-This task involves implementing new features:
-- Feature A implementation
-- Feature B testing
-
-Steps:
-1. Design component
-2. Implement logic
-3. Add tests
-
-Acceptance Criteria:
-- All tests passing
-- Documentation updated
-```
-
-## Error Handling
-
-The server provides detailed error messages for:
-
-- Invalid issue keys
-- Missing required fields
-- Permission issues
-- API rate limits
-
-## Setup Instructions
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/George5562/Jira-MCP-Server.git
-   cd Jira-MCP-Server
-   ```
-
-2. Install dependencies:
-
+1. Clone this repository
+2. Configure your Jira credentials (see Configuration section below)
+3. Install dependencies:
    ```bash
    npm install
    ```
-
-3. Configure environment variables:
-   Create a `.env` file in the root directory:
-
-   ```bash
-   JIRA_HOST=your-instance.atlassian.net
-   JIRA_EMAIL=your-email@example.com
-   JIRA_API_TOKEN=your-api-token
-   ```
-
-4. Build the project:
-
-   ```bash
-   npm run build
-   ```
-
-5. Start the server:
+4. Start the server:
    ```bash
    npm start
    ```
 
-## Configuring Claude Desktop
+## Configuration
 
-To use this MCP server with Claude Desktop:
+The server requires the following environment variables to be set:
 
-1. Locate your Claude Desktop configuration file:
+| Variable           | Description                 | Example                                                                                         |
+| ------------------ | --------------------------- | ----------------------------------------------------------------------------------------------- |
+| `JIRA_HOST`        | Your Jira instance hostname | `your-company.atlassian.net`                                                                    |
+| `JIRA_EMAIL`       | Your Jira account email     | `your.email@company.com`                                                                        |
+| `JIRA_API_TOKEN`   | API token from Atlassian    | Get it from [Atlassian API tokens](https://id.atlassian.com/manage-profile/security/api-tokens) |
+| `JIRA_PROJECT_KEY` | Default project key         | `PROJ`                                                                                          |
 
-   - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
-   - Windows: `%APPDATA%/Claude/claude_desktop_config.json`
-   - Linux: `~/.config/Claude/claude_desktop_config.json`
+You can set these environment variables in a `.env` file in the root directory:
 
-2. Add the Jira MCP server to your configuration:
+```env
+JIRA_HOST=your-company.atlassian.net
+JIRA_EMAIL=your.email@company.com
+JIRA_API_TOKEN=your-api-token
+JIRA_PROJECT_KEY=PROJ
+```
 
-   ```json
-   {
-     "mcp_servers": [
-       {
-         "name": "jira-server",
-         "command": "npm start",
-         "cwd": "/path/to/jira-server",
-         "env": {
-           "JIRA_HOST": "your-instance.atlassian.net",
-           "JIRA_EMAIL": "your-email@example.com",
-           "JIRA_API_TOKEN": "your-api-token"
-         }
-       }
-     ]
-   }
-   ```
+Note: Make sure to add `.env` to your `.gitignore` file to prevent committing sensitive credentials.
 
-   Replace `/path/to/jira-server` with the absolute path to your cloned repository.
+## Credits
 
-3. Restart Claude Desktop to apply the changes.
+This project is forked from [George5562/Jira-MCP-Server](https://github.com/George5562/Jira-MCP-Server) and enhanced with additional functionality.
 
-## References
+## License
 
-- [Model Context Protocol](https://github.com/modelcontextprotocol)
-- [Jira REST API Documentation](https://docs.atlassian.com/software/jira/docs/api/REST/7.12.0)
-- [Jira REST API Examples](https://developer.atlassian.com/server/jira/platform/jira-rest-api-examples/)
+Please refer to the original repository for license information.
