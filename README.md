@@ -53,13 +53,16 @@ The following MCP tools are available in this server:
 
 1. Clone this repository
 2. Configure your Jira credentials (see Configuration section below)
-3. Install dependencies:
+3. Install dependencies and build:
    ```bash
    npm install
+   npm run build
    ```
 4. Start the server:
+
    ```bash
-   npm start
+
+   npm run start
    ```
 
 ## Configuration

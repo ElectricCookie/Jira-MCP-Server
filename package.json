@@ -4,13 +4,11 @@
   "description": "A Model Context Protocol server implementation for interacting with Jira's REST API. Provides tools for managing issues, comments, worklogs and more.",
   "private": true,
   "type": "module",
-  "bin": {
-    "jira-server": "./build/index.js"
-  },
   "files": [
     "build"
   ],
   "scripts": {
+    "start": "node build/index.js",
     "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
     "prepare": "npm run build",
     "watch": "tsc --watch",
